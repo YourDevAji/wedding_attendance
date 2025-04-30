@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Oyinola & Emiola's Wedding</title>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script defer src="script.js"></script>
+    <style>
+        :root {
+            --primary-color: #8e44ad;
+            --secondary-color: #9b59b6;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+
+        .hero-section {
+            background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://iuntxptbjopijwjymoje.supabase.co/storage/v1/object/public/couple-header//couple-test.jpeg');
+            background-size: cover;
+            background-position: center;
+            height: 60vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-align: center;
+            position: relative;
+        }
+
+        .names {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2.5rem, 8vw, 4rem);
+            margin-bottom: 1.5rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .form-container {
+            max-width: 600px;
+            margin: 3rem auto;
+            padding: 2rem;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            background-color: white;
+            width: calc(100% - 2rem);
+        }
+
+        .thank-you {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+            max-width: 600px;
+            margin: 3rem auto;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+            border-color: var(--secondary-color);
+        }
+
+        .account-details {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+            display: none;
+        }
+
+        .account-item {
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .account-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        /* Overlay styles */
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .overlay-content {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 8px;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+        }
+
+        .spinner-border {
+            width: 3rem;
+            height: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        /* Loading button state */
+        .btn-loading {
+            position: relative;
+            pointer-events: none;
+        }
+
+        .btn-loading::after {
+            content: "";
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            margin: auto;
+            border: 4px solid transparent;
+            border-top-color: #ffffff;
+            border-radius: 50%;
+            animation: button-loading-spinner 1s ease infinite;
+        }
+
+        @keyframes button-loading-spinner {
+            from {
+                transform: rotate(0turn);
+            }
+            to {
+                transform: rotate(1turn);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero-section {
+                height: 50vh;
+            }
+
+            .form-container, .thank-you {
+                margin: 1.5rem auto;
+                padding: 1.5rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .hero-section {
+                height: 40vh;
+            }
+
+            .form-container, .thank-you {
+                margin: 1rem auto;
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="hero-section">
+    <div>
+        <div class="names">Oyinola & Emiola</div>
+        <h2>We're Getting Married!</h2>
+        <p>Would be honored to have you celebrate with us</p>
+    </div>
+</div>
+
+<div class="container form-container" id="rsvpForm">
+    <h2 class="text-center mb-4">RSVP</h2>
+    <p class="text-center mb-4">Please let us know if you will be in attendance so we can accurately accommodate you.</p>
+
+    <form id="guestForm">
+        <div class="mb-3">
+            <label for="fullName" class="form-label">Full Name</label>
+            <input type="text" class="form-control" id="fullName" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="email" class="form-label">Email</label>
+            <input type="email" class="form-control" id="email" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="phone" class="form-label">Phone Number</label>
+            <input type="tel" class="form-control" id="phone">
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Will you be attending?</label>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="attending" id="attendingYes" value="yes" required>
+                <label class="form-check-label" for="attendingYes">I will be attending</label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="attending" id="attendingNo" value="no">
+                <label class="form-check-label" for="attendingNo">I will not be attending</label>
+            </div>
+        </div>
+
+        <div class="mb-3" id="guestCountSection" style="display: none;">
+            <label for="guestCount" class="form-label">Number of guests (including yourself)</label>
+            <select class="form-select" id="guestCount">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label for="giftOption" class="form-label">Monetary gifts will be appreciated</label>
+            <select class="form-select" id="giftOption">
+                <option value="none">No gift</option>
+                <option value="bank">Bank Transfer</option>
+                <option value="paypal">PayPal</option>
+                <option value="venmo">Venmo</option>
+                <option value="cash">Cash at event</option>
+            </select>
+        </div>
+
+        <!-- Account Details Container -->
+        <div id="accountDetailsContainer" class="account-details">
+            <div class="d-flex justify-content-center">
+                <div class="spinner-border text-primary" role="status" id="accountLoadingSpinner">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </div>
+            <div id="accountDetailsList"></div>
+        </div>
+
+        <div class="mb-3" id="giftDetails" style="display: none;">
+            <label for="giftMessage" class="form-label">Gift Message (optional)</label>
+            <textarea class="form-control" id="giftMessage" rows="2"></textarea>
+        </div>
+
+        <div class="d-grid mt-4">
+            <button type="submit" class="btn btn-primary btn-lg" id="submitButton">Submit RSVP</button>
+        </div>
+    </form>
+</div>
+
+<div class="container thank-you" id="thankYou">
+    <h2>Thank You!</h2>
+    <p>Your response has been recorded. We appreciate your confirmation and look forward to celebrating with you.</p>
+    <p>God bless you.</p>
+</div>
+
+<!-- Overlay for loading and messages -->
+<div class="overlay" id="overlay">
+    <div class="overlay-content">
+        <div class="spinner-border text-primary" role="status" id="overlaySpinner">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <h4 id="overlayMessage">Processing your RSVP...</h4>
+    </div>
+</div>
+
+</body>
+</html>
